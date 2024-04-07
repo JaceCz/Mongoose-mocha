@@ -5,8 +5,13 @@ import {MongoClient } from 'mongodb';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+//dotenv.config()
 import bodyParser from 'body-parser'
-dotenv.config()
+import mongoose from 'mongoose';
+dotenv.config({ path: '/.env' });
+
+console.log('MONGO_CONNECT:', process.env.MONGO_CONNECT);
+
 
 const jsonParser = bodyParser.json()
 
@@ -24,6 +29,34 @@ app.use(express.static(path.join(__dirname, '../posters')));
 //app.use(express.static("posters"));
 
 const upload = multer({ dest: 'posters/' })
+
+mongoose.connect(process.env.MONGO_CONNECT, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB...'))
+  .catch(err => console.error('Could not connect to MongoDB...', err));
+
+
+const customerSchema = new mongoose.Schema({
+  name: String,
+  movie: String,
+  email: { type: String, required: true }
+});
+
+const Customer = mongoose.model('Customer', customerSchema);
+
+app.post('/api/addInfo', async (req, res) => {
+  const { name, movie, email } = req.body;
+  if (!name || !movie || !email) {
+    return res.status(206).send({ error: 'Missing required fields' });
+  }
+  
+  try {
+    const customer = new Customer({ name, movie, email });
+    await customer.save();
+    res.status(201).send(customer);
+  } catch (error) {
+    res.status(500).send({ error: 'Internal server error' });
+  }
+});
 
 app.get(/^(?!\/api).+/, (req, res) => {
   res.sendFile(path.join(__dirname, '../build/index.html'))
@@ -121,3 +154,6 @@ const saveData = () => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+export default app;
+

@@ -7,20 +7,24 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --require dotenv/config --exit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
-    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongodb": "^5.0.1",
+    "mongoose": "^8.3.0",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "chai": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "mocha": "^10.4.0",
+    "nodemon": "^2.0.20",
+    "supertest": "^6.3.4"
   }
 }
